@@ -1,0 +1,13 @@
+Server:		127.0.0.53
+Address:	127.0.0.53#53
+
+Non-authoritative answer:
+Name:	brigante.info
+Address: 104.21.81.129
+Name:	brigante.info
+Address: 172.67.160.231
+Name:	brigante.info
+Address: 2606:4700:3034::6815:5181
+Name:	brigante.info
+Address: 2606:4700:3036::ac43:a0e7
+
