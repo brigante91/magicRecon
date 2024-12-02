@@ -53,22 +53,22 @@ Esegui il tool con le seguenti opzioni:
 
 - **Ricognizione Passiva**:
   ```bash
-  ./ExpandedMagicRecon.sh -d <domain> -p
+  ./MagicRecon.sh -d <domain> -p
   ```
 
 - **Ricognizione Attiva**:
   ```bash
-  ./ExpandedMagicRecon.sh -d <domain> -a
+  ./MagicRecon.sh -d <domain> -a
   ```
 
 - **Analisi di Vulnerabilità**:
   ```bash
-  ./ExpandedMagicRecon.sh -d <domain> -v
+  ./MagicRecon.sh -d <domain> -v
   ```
 
 - **Tutte le modalità**:
   ```bash
-  ./ExpandedMagicRecon.sh -d <domain> -p -a -v
+  ./MagicRecon.sh -d <domain> -p -a -v
   ```
 
 ## Directory di output
