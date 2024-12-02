@@ -1,7 +1,7 @@
 
-# MagicRecon
+# InfinityRecon
 
-MagicRecon è un framework di ricognizione e scansione delle vulnerabilità altamente automatizzato progettato per aiutare i professionisti della sicurezza a raccogliere informazioni, eseguire scansioni di vulnerabilità e generare report dettagliati su un obiettivo.
+InfinityRecon è un framework di ricognizione e scansione delle vulnerabilità altamente automatizzato progettato per aiutare i professionisti della sicurezza a raccogliere informazioni, eseguire scansioni di vulnerabilità e generare report dettagliati su un obiettivo.
 
 ## Caratteristiche principali
 
@@ -53,22 +53,22 @@ Esegui il tool con le seguenti opzioni:
 
 - **Ricognizione Passiva**:
   ```bash
-  ./MagicRecon.sh -d <domain> -p
+  ./InfinityRecon.sh -d <domain> -p
   ```
 
 - **Ricognizione Attiva**:
   ```bash
-  ./MagicRecon.sh -d <domain> -a
+  ./InfinityRecon.sh -d <domain> -a
   ```
 
 - **Analisi di Vulnerabilità**:
   ```bash
-  ./MagicRecon.sh -d <domain> -v
+  ./InfinityRecon.sh -d <domain> -v
   ```
 
 - **Tutte le modalità**:
   ```bash
-  ./MagicRecon.sh -d <domain> -p -a -v
+  ./InfinityRecon.sh -d <domain> -p -a -v
   ```
 
 ## Directory di output
@@ -89,4 +89,4 @@ Contributi e suggerimenti sono benvenuti! Sentiti libero di aprire una issue o i
 
 ## Licenza
 
-MagicRecon è distribuito sotto licenza MIT. Consulta il file `LICENSE` per maggiori dettagli.
+InfinityRecon è distribuito sotto licenza MIT. Consulta il file `LICENSE` per maggiori dettagli.
