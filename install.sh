@@ -1,102 +1,101 @@
+
 #!/bin/bash
 
-. ./configuration.cfg
+# Log file
+LOG_FILE="install.log"
 
-BOLD=$(tput bold)
-YELLOW=$(tput setaf 3)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-NORMAL=$(tput sgr0)
+# Helper Functions
+log_info() {
+    echo -e "\033[1;32m[INFO]\033[0m $1" | tee -a $LOG_FILE
+}
 
-printf "${BOLD}${YELLOW}##########################################################\n"
-printf "##### Welcome to the MagicRecon dependency installer #####\n"
-printf "##########################################################\n\n${NORMAL}"
+log_error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1" | tee -a $LOG_FILE
+}
 
-sudo apt-get -y update
+# Detect package manager
+detect_package_manager() {
+    if command -v apt &> /dev/null; then
+        echo "apt"
+    elif command -v yum &> /dev/null; then
+        echo "yum"
+    elif command -v dnf &> /dev/null; then
+        echo "dnf"
+    else
+        log_error "Unsupported package manager. Please install the required tools manually."
+        exit 1
+    fi
+}
 
-printf "${BOLD}${MAGENTA}Installing programming languages and essential packages\n${NORMAL}"
-sudo apt-get install -y python3-pip dnspython golang cargo html2text whatweb theharvester nmap dirsearch sqlmap cargo subjack
+# Install base dependencies
+install_dependencies() {
+    package_manager=$(detect_package_manager)
+    log_info "Using $package_manager to install base dependencies."
 
-printf "${BOLD}${MAGENTA}Cloning repositories and installing dependencies\n${NORMAL}"
-cd $HOME
-mkdir -p tools
-cd tools
+    if [ "$package_manager" == "apt" ]; then
+        sudo apt update && sudo apt install -y curl git python3 python3-pip build-essential
+    elif [ "$package_manager" == "yum" ] || [ "$package_manager" == "dnf" ]; then
+        sudo $package_manager install -y curl git python3 python3-pip gcc
+    fi
+}
 
-declare -A REPOS=(
-  ["Asnlookup"]="https://github.com/yassineaboukir/Asnlookup"
-  ["ssl-checker"]="https://github.com/narbehaj/ssl-checker"
-  ["cloud_enum"]="https://github.com/initstring/cloud_enum"
-  ["GitDorker"]="https://github.com/obheda12/GitDorker"
-  ["robotScraper"]="https://github.com/robotshell/robotScraper.git"
-  ["nuclei-templates"]="https://github.com/projectdiscovery/nuclei-templates.git"
-  ["SecLists"]="https://github.com/danielmiessler/SecLists"
-  ["Corsy"]="https://github.com/s0md3v/Corsy.git"
-  ["SecretFinder"]="https://github.com/m4ll0k/SecretFinder.git"
-  ["CMSeeK"]="https://github.com/Tuhinshubhra/CMSeeK"
-  ["findomain"]="https://github.com/findomain/findomain.git"
-  ["hacks"]="https://github.com/tomnomnom/hacks"
-  ["Bolt"]="https://github.com/s0md3v/Bolt"
-  ["Gf-Patterns"]="https://github.com/1ndianl33t/Gf-Patterns"
-)
+# Install tools
+install_tools() {
+    for tool in python3 pip3 subfinder httpx nuclei nmap figlet parallel gau hakrawler arjun dirsearch whatweb theHarvester CloudEnum GitDorker Amass Waybackurls dnsx assetfinder crt.sh SecurityTrails masscan gowitness aquatone jaeles xsser truffleHog gitrob dnsrecon dnsprobe zmap webanalyze gf dnsgen; do
+        if ! command -v "$tool" &> /dev/null; then
+            log_info "Installing $tool..."
+            case $tool in
+                subfinder)
+                    GO111MODULE=on go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+                    ;;
+                httpx)
+                    GO111MODULE=on go install github.com/projectdiscovery/httpx/cmd/httpx@latest
+                    ;;
+                nuclei)
+                    GO111MODULE=on go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+                    ;;
+                hakrawler)
+                    GO111MODULE=on go install github.com/hakluke/hakrawler@latest
+                    ;;
+                gau)
+                    GO111MODULE=on go install github.com/lc/gau/v2/cmd/gau@latest
+                    ;;
+                dnsx)
+                    GO111MODULE=on go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+                    ;;
+                waybackurls)
+                    GO111MODULE=on go install github.com/tomnomnom/waybackurls@latest
+                    ;;
+                nuclei-templates)
+                    git clone https://github.com/projectdiscovery/nuclei-templates.git ~/tools/nuclei-templates
+                    ;;
+                *)
+                    log_error "$tool requires manual installation or is not supported."
+                    ;;
+            esac
+        else
+            log_info "$tool is already installed."
+        fi
+    done
+}
 
-for repo in "${!REPOS[@]}"; do
-  printf "${CYAN}Cloning ${repo}\n${NORMAL}"
-  git clone "${REPOS[$repo]}"
-  cd "$repo"
-  if [ -f requirements.txt ]; then
-    pip3 install -r requirements.txt --break-system-packages
-  fi
-  cd ..
-done
+# Final checks
+final_verification() {
+    log_info "Verifying installation of all tools..."
+    for tool in python3 pip3 subfinder httpx nuclei nmap figlet parallel gau hakrawler arjun dirsearch whatweb theHarvester CloudEnum GitDorker Amass Waybackurls dnsx assetfinder crt.sh SecurityTrails masscan gowitness aquatone jaeles xsser truffleHog gitrob dnsrecon dnsprobe zmap webanalyze gf dnsgen; do
+        if ! command -v "$tool" &> /dev/null; then
+            log_error "$tool installation failed. Please check the log."
+        else
+            log_info "$tool installed successfully."
+        fi
+    done
+}
 
-pip3 install arjun
+# Main script logic
+main() {
+    install_dependencies
+    install_tools
+    final_verification
+}
 
-printf "${CYAN}Building findomain\n${NORMAL}"
-cd findomain
-cargo build --release
-sudo cp target/release/findomain /usr/bin/
-cd ..
-
-printf "${CYAN}Building anti-burl\n${NORMAL}"
-cd hacks/anti-burl/
-go build main.go
-sudo mv main ~/go/bin/anti-burl
-cd ../..
-
-mkdir -p ~/.gf
-cp -r Gf-Patterns/* ~/.gf
-
-printf "${BOLD}${MAGENTA}Installing GO tools\n${NORMAL}"
-declare -a GO_TOOLS=(
-  "github.com/OWASP/Amass/v3/..."
-  "github.com/michenriksen/aquatone"
-  "github.com/projectdiscovery/subfinder/v2/cmd/subfinder"
-  "github.com/hakluke/hakrawler"
-  "github.com/tomnomnom/anew"
-  "github.com/projectdiscovery/httpx/cmd/httpx"
-  "github.com/projectdiscovery/notify/cmd/notify"
-  "github.com/projectdiscovery/nuclei/v2/cmd/nuclei"
-  "github.com/lc/gau"
-  "github.com/tomnomnom/gf"
-  "github.com/tomnomnom/qsreplace"
-  "github.com/hahwul/dalfox/v2"
-  "github.com/tomnomnom/hacks/html-tool"
-  "github.com/tomnomnom/waybackurls"
-)
-
-for tool in "${GO_TOOLS[@]}"; do
-  printf "${CYAN}Installing $(basename $tool)\n${NORMAL}"
-  go install "$tool@latest"
-  sudo cp "$HOME/go/bin/$(basename $tool)" /usr/local/bin/
-done
-
-echo 'source $GOPATH/src/github.com/tomnomnom/gf/gf-completion.bash' >> ~/.bashrc
-cp -r ~/go/src/github.com/tomnomnom/gf/examples ~/.gf
-
-printf "${CYAN}Installing MailSpoof\n${NORMAL}"
-sudo pip3 install mailspoof
-
-printf "${CYAN}Installing Shcheck\n${NORMAL}"
-git clone https://github.com/santoru/shcheck
-
-printf "${BOLD}${YELLOW}Installation completed successfully!\n${NORMAL}"
+main
