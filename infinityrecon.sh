@@ -10,7 +10,7 @@ TARGETS_DIR="targets"
 RECON_DIR="recon_results"
 LOG_FILE="magicrecon.log"
 NOTIFY_CMD="notify -silent"
-DEFAULT_PROTOCOL="https://"
+# Protocol will now be detected automatically
 
 # Helper Functions
 log_info() {
@@ -46,7 +46,7 @@ prepare_environment() {
 # Passive Recon
 passive_recon() {
     domain=$1
-    url="$DEFAULT_PROTOCOL$domain"  # Combine protocol with domain for tools requiring URLs
+    url="$(curl -s -o /dev/null -w '%{scheme}' $domain)://$domain"  # Combine protocol with domain for tools requiring URLs
     log_info "Starting Passive Recon for $domain"
     
     recon_dir="$TARGETS_DIR/$domain/$RECON_DIR"
@@ -71,7 +71,7 @@ passive_recon() {
 # Active Recon
 active_recon() {
     domain=$1
-    url="$DEFAULT_PROTOCOL$domain"
+    url="$(curl -s -o /dev/null -w '%{scheme}' $domain)://$domain"
     log_info "Starting Active Recon for $domain"
     
     recon_dir="$TARGETS_DIR/$domain/$RECON_DIR"
@@ -82,7 +82,7 @@ active_recon() {
         "httpx -silent -u $url -o $recon_dir/httpx.txt" \
         "arjun -u $url -oT $recon_dir/parameters.txt" \
         "hakrawler -url $url | tee $recon_dir/hakrawler.txt" \
-        "dirsearch -u $url -w $dictionary --format plain -o $recon_dir/dirsearch.txt" \
+        "dirsearch -u $url -w $dictionary_file --format plain -o $recon_dir/dirsearch.txt" \
         "masscan -p1-65535,U:1-65535 $domain --rate=10000 -oX $recon_dir/masscan.xml" \
         "gowitness file -f $recon_dir/httpx.txt -d $recon_dir/screenshots/" \
         "aquatone -ports xlarge -out $recon_dir/aquatone"
@@ -91,7 +91,7 @@ active_recon() {
 # Vulnerability Scanning
 vulnerability_scan() {
     domain=$1
-    url="$DEFAULT_PROTOCOL$domain"
+    url="$(curl -s -o /dev/null -w '%{scheme}' $domain)://$domain"
     log_info "Starting Vulnerability Scan for $domain"
     
     recon_dir="$TARGETS_DIR/$domain/$RECON_DIR"
@@ -111,11 +111,37 @@ vulnerability_scan() {
 }
 
 # Main script logic
+
+# Show help message
+show_help() {
+    echo "
+Usage: ./InfinityRecon.sh -d <domain> --dictionary <dictionary_file> [options]
+
+Options:
+  -d, --domain <domain>          Target domain for the scan.
+  --dictionary <dictionary_file> Path to the dictionary file for directory brute-forcing.
+  -p                             Perform passive reconnaissance.
+  -a                             Perform active reconnaissance.
+  -v                             Perform vulnerability scanning.
+  -h, --help                     Show this help message and exit.
+
+Examples:
+  ./InfinityRecon.sh -d example.com --dictionary common.txt -p
+  ./InfinityRecon.sh -d example.com --dictionary common.txt -a -v
+"
+    exit 0
+}
+
 main() {
     check_tools
     prepare_environment
 
-    while getopts "d:pavh" opt; do
+    while [[ "$1" != "" ]]; do
+    case $1 in
+        -h | --help )
+            show_help
+            ;;
+ "d:pavh" opt; do
         case $opt in
             d) domain="$OPTARG" ;;
             p) passive="true" ;;

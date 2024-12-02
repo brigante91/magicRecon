@@ -29,7 +29,7 @@ InfinityRecon è un framework di ricognizione e scansione delle vulnerabilità a
   - `jaeles`, `xsser`, `truffleHog`, `gitrob`, `dnsrecon`, `dnsprobe`, `zmap`, `webanalyze`, `gf`
 
 - **Configurazioni aggiuntive**:
-  - Modifica il file `configuration.cfg` per personalizzare opzioni come il dizionario per `dirsearch`, il protocollo predefinito (`http/https`), e altre impostazioni.
+  - Passa il file dizionario come parametro tramite l'opzione `--dictionary`., il protocollo predefinito (`http/https`), e altre impostazioni.
 
 ## Installazione
 
@@ -53,22 +53,22 @@ Esegui il tool con le seguenti opzioni:
 
 - **Ricognizione Passiva**:
   ```bash
-  ./InfinityRecon.sh -d <domain> -p
+  ./InfinityRecon.sh -d <domain> --dictionary <dictionary_file> -p
   ```
 
 - **Ricognizione Attiva**:
   ```bash
-  ./InfinityRecon.sh -d <domain> -a
+  ./InfinityRecon.sh -d <domain> --dictionary <dictionary_file> -a
   ```
 
 - **Analisi di Vulnerabilità**:
   ```bash
-  ./InfinityRecon.sh -d <domain> -v
+  ./InfinityRecon.sh -d <domain> --dictionary <dictionary_file> -v
   ```
 
 - **Tutte le modalità**:
   ```bash
-  ./InfinityRecon.sh -d <domain> -p -a -v
+  ./InfinityRecon.sh -d <domain> --dictionary <dictionary_file> -p -a -v
   ```
 
 ## Directory di output
